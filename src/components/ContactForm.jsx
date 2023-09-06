@@ -1,9 +1,14 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContacts } from 'redux/selector';
+import { nanoid } from 'nanoid';
+import { addContact } from 'redux/contactsSlice/contactsSlice';
 
-export const ContactForm = ({ onAddContact }) => {
+export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
   const handelChange = e => {
     if (e.target.name === 'name') {
       setName(e.target.value);
@@ -14,7 +19,15 @@ export const ContactForm = ({ onAddContact }) => {
 
   const handelSubmit = e => {
     e.preventDefault();
-    onAddContact(name, number);
+    if (
+      contacts.find(
+        contact => contact.name.toLowerCase() === name.toLowerCase()
+      )
+    ) {
+      alert(`${name} is already in contacts`);
+      return;
+    }
+    dispatch(addContact({ id: nanoid(), name, number }));
     setName('');
     setNumber('');
   };
